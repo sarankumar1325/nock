@@ -71,6 +71,23 @@ describe('`enableNetConnect()`', () => {
     expect(onResponse).to.have.been.calledOnce()
   })
 
+  for (const flag of ['g', 'y']) {
+    it(`allows repeated requests via a regexp with the \`${flag}\` flag`, async () => {
+      const onResponse = sinon.spy()
+      const { origin } = await servers.startHttpServer((request, response) => {
+        onResponse()
+        response.writeHead(200)
+        response.end()
+      })
+
+      nock.enableNetConnect(new RegExp('^localhost:', flag))
+
+      await got(origin)
+      await got(origin)
+      expect(onResponse).to.have.been.calledTwice()
+    })
+  }
+
   it('disallows request for other domains, via regexp', async () => {
     nock.enableNetConnect(/ocalhos/)
 

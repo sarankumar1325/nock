@@ -23,6 +23,11 @@ function enableNetConnect(
 }
 
 function isEnabledForNetConnect(url: string) {
+  if (allowNetConnect instanceof RegExp) {
+    // Global and sticky regexps keep state in `lastIndex` between `test()`
+    // calls, so a match would make the next check for the same host fail.
+    allowNetConnect.lastIndex = 0
+  }
   const enabled = !!(allowNetConnect && allowNetConnect.test(url))
   debug('Net connect', enabled ? '' : 'not', 'enabled for', url)
   return enabled
